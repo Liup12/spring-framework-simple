@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean id="testBeanFactoryPostprocessor" class="com.xuande.spring.beans.TestBeanFactoryPostprocessor"> </bean>
+    <bean id="testBeanPostprocessor" class="com.xuande.spring.beans.TestBeanPostprocessor"> </bean>
+
+</beans>

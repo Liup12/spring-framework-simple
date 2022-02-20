@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean id="userDao" class="com.xuande.spring.UserDao" init-method="init" destroy-method="destroy"></bean>
+
+    <bean id="userService" class="com.xuande.spring.UserService">
+        <property name = "name" value = "臭宝"></property>
+        <property name = "userDao" ref="userDao"></property>
+    </bean>
+
+
+    <bean id="teacherService" class="com.xuande.spring.TeacherService"></bean>
+
+</beans>
