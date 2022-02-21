@@ -7,8 +7,10 @@ import com.xuande.spring.beans.factory.config.SingletonBeanRegistry;
 
 import java.beans.Beans;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author : xuande
@@ -16,9 +18,11 @@ import java.util.Set;
  **/
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
-    private Map<String, Object> singletonBeanMap = new HashMap<>();
+    protected static final Object NULL_OBJECT = new Object();
 
-    private final Map<String, DisposableBean> disposableBeans = new HashMap<>();
+    private Map<String, Object> singletonBeanMap = new ConcurrentHashMap<>();
+
+    private final Map<String, DisposableBean> disposableBeans = new LinkedHashMap<>();
 
     public void registerDisposableBean(String beanName, DisposableBean bean) {
         disposableBeans.put(beanName, bean);

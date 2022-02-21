@@ -9,6 +9,6 @@
     </bean>
 
 
-    <bean id="teacherService" class="com.xuande.spring.TeacherService"></bean>
+    <bean id="teacherService" class="com.xuande.spring.TeacherService" scope="singleton"></bean>
 
 </beans>
