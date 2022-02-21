@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="proxyProductDao" class="com.xuande.spring.ProxyBeanFactory"></bean>
+
+    <bean id="productService" class="com.xuande.spring.service.ProductService" scope="prototype">
+        <property name="itemCode" value="900001"></property>
+        <property name="itemName" value="雅顿金胶"></property>
+        <property name="productDao" ref="proxyProductDao"></property>
+    </bean>
+</beans>

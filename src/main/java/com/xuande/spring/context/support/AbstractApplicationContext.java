@@ -4,10 +4,17 @@ import com.xuande.spring.beans.BeansException;
 import com.xuande.spring.beans.factory.ConfigurableListableBeanFactory;
 import com.xuande.spring.beans.factory.config.BeanFactoryPostProcessor;
 import com.xuande.spring.beans.factory.config.BeanPostProcessor;
+import com.xuande.spring.context.ApplicationEvent;
+import com.xuande.spring.context.ApplicationListener;
 import com.xuande.spring.context.ConfigurationApplicationContext;
+import com.xuande.spring.context.event.ApplicationEventMulticaster;
+import com.xuande.spring.context.event.ContextClosedEvent;
+import com.xuande.spring.context.event.ContextRefreshedEvent;
+import com.xuande.spring.context.event.SimpleApplicationEventMulticaster;
 import com.xuande.spring.core.io.DefaultResourceLoader;
 import com.xuande.spring.core.io.Resource;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -16,6 +23,9 @@ import java.util.Map;
  **/
 public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurationApplicationContext {
 
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
+    public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
     @Override
     public void refresh() throws BeansException {
@@ -35,8 +45,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         // 5、BeanPostProcessor 需要提前与其他 Bean 对象实例化之前执行
         registerBeanPostProcessor(beanFactory);
 
-        // 6、提前实例化单例Bean对象
+        // 6、初始化事件发布者
+        initApplicationEventMulticaster();
+
+        // 7、注册事件监听器
+        registerListener();
+
+        // 8、提前实例化单例Bean对象
         beanFactory.preInstantiateSingletons();
+
+        // 9、发布容器刷新完成事件
+        finishRefresh();
     }
 
     protected abstract void refreshBeanFactory() throws BeansException;
@@ -59,6 +78,28 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         }
     }
 
+
+    private void initApplicationEventMulticaster(){
+        ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
+        beanFactory.registerSingletonBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, applicationEventMulticaster);
+    }
+
+    private void registerListener(){
+        Collection<ApplicationListener> applicationListeners = getBeansOfType(ApplicationListener.class).values();
+        for (ApplicationListener applicationListener : applicationListeners) {
+            applicationEventMulticaster.addApplicationListener(applicationListener);
+        }
+    }
+
+    private void finishRefresh(){
+        publishEvent(new ContextRefreshedEvent(this));
+    }
+
+    @Override
+    public void publishEvent(ApplicationEvent event) {
+        applicationEventMulticaster.multicastEvent(event);
+    }
 
     @Override
     public Object genBean(String name) throws BeansException {
@@ -92,6 +133,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     @Override
     public void close() {
+        //发布容器关闭监听器
+        publishEvent(new ContextClosedEvent(this));
+
         getBeanFactory().destroySingletons();
     }
 }

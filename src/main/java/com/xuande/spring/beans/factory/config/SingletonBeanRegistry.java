@@ -11,7 +11,7 @@ public interface SingletonBeanRegistry {
      * @param beanName
      * @param bean
      */
-    void addSingletonBean(String beanName, Object bean);
+    void registerSingletonBean(String beanName, Object bean);
 
 
 }

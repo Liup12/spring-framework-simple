@@ -20,4 +20,13 @@ public class ClassUtils {
         }
         return cl;
     }
+
+
+    public static boolean isCglibProxyClass(Class<?> clazz){
+        return clazz != null && isCglibClassName(clazz.getName());
+    }
+
+    public static boolean isCglibClassName(String className){
+        return className != null && className.contains("$$");
+    }
 }

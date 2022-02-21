@@ -43,7 +43,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
         if (beanDefinition.isSingleton()){
-            addSingletonBean(beanName, bean);
+            registerSingletonBean(beanName, bean);
         }
 
         return bean;

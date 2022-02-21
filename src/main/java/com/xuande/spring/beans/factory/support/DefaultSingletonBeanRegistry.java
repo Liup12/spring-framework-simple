@@ -29,7 +29,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     }
 
     @Override
-    public void addSingletonBean(String beanName, Object bean) {
+    public void registerSingletonBean(String beanName, Object bean) {
         singletonBeanMap.put(beanName, bean);
     }
 

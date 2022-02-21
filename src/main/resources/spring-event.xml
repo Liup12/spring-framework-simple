@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="contextClosedEventListener" class="com.xuande.spring.event.ContextClosedEventListener"></bean>
+    <bean id="contextRefreshedEventListener" class="com.xuande.spring.event.ContextRefreshedEventListener"></bean>
+    <bean id="syncProductEventListener" class="com.xuande.spring.event.SyncProductEventListener"></bean>
+</beans>
