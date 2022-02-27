@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+
+    <bean id="shopService" class="com.xuande.spring.service.impl.ShopService"></bean>
+
+    <bean id="shopServiceBeforeAdvice" class="com.xuande.spring.aop.ShopServiceBeforeAdvice"></bean>
+
+    <bean class="com.xuande.spring.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>
+
+    <bean id="methodBeforeAdviceInterceptor" class="com.xuande.spring.aop.framework.adapter.MethodBeforeAdviceInterceptor">
+        <property name="beforeAdvice" ref="shopServiceBeforeAdvice"></property>
+    </bean>
+
+    <bean id="pointCutAdvisor" class="com.xuande.spring.aop.aspectj.AspectJExpressionPointCutAdvisor">
+        <property name="advice" ref = "methodBeforeAdviceInterceptor"></property>
+        <property name="expression" value="execution(* com.xuande.spring.service.IShopService.*(..))" ></property>
+    </bean>
+</beans>

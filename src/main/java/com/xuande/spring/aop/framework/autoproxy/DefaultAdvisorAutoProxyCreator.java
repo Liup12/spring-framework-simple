@@ -1,9 +1,21 @@
 package com.xuande.spring.aop.framework.autoproxy;
 
+import com.xuande.spring.aop.AdvisedSupport;
+import com.xuande.spring.aop.ClassFilter;
+import com.xuande.spring.aop.PointCut;
+import com.xuande.spring.aop.TargetSource;
+import com.xuande.spring.aop.aspectj.AspectJExpressionPointCutAdvisor;
+import com.xuande.spring.aop.framework.Advisor;
+import com.xuande.spring.aop.framework.ProxyFactory;
 import com.xuande.spring.beans.BeansException;
 import com.xuande.spring.beans.factory.BeanFactory;
 import com.xuande.spring.beans.factory.BeanFactoryAware;
 import com.xuande.spring.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import com.xuande.spring.beans.factory.support.DefaultListableBeanFactory;
+import org.aopalliance.aop.Advice;
+import org.aopalliance.intercept.MethodInterceptor;
+
+import java.util.Collection;
 
 /**
  * @author xuande (xuande@dajiaok.com)
@@ -11,11 +23,49 @@ import com.xuande.spring.beans.factory.config.InstantiationAwareBeanPostProcesso
  */
 public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPostProcessor,BeanFactoryAware {
 
-    private BeanFactory beanFactory;
+    private DefaultListableBeanFactory beanFactory;
+
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
+        this.beanFactory = (DefaultListableBeanFactory) beanFactory;
+    }
+
+    @Override
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+        if (isInfrastructureClass(beanClass)){
+            return null;
+        }
+        Collection<AspectJExpressionPointCutAdvisor> pointCutAdvisors = beanFactory.getBeansOfType(AspectJExpressionPointCutAdvisor.class).values();
+        for (AspectJExpressionPointCutAdvisor pointCutAdvisor : pointCutAdvisors) {
+            ClassFilter classFilter = pointCutAdvisor.getPointCut().getClassFilter();
+            if (!classFilter.matches(beanClass)){
+                continue;
+            }
+            TargetSource targetSource = null;
+            try {
+                targetSource = new TargetSource(beanClass.getDeclaredConstructor().newInstance());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            AdvisedSupport advisedSupport = new AdvisedSupport();
+            advisedSupport.setTargetSource(targetSource);
+            advisedSupport.setMethodInterceptor((MethodInterceptor) pointCutAdvisor.getAdvice());
+            advisedSupport.setMethodMatcher(pointCutAdvisor.getPointCut().getMethodMatcher());
+            advisedSupport.setProxyTargetClass(false);
+            return new ProxyFactory(advisedSupport).getProxy();
+        }
+
+        return null;
+    }
+
+    /**
+     * 剔除拦截方法，切面，advisor
+     * @param clazz
+     * @return
+     */
+    private boolean isInfrastructureClass(Class<?> clazz){
+        return Advice.class.isAssignableFrom(clazz) || PointCut.class.isAssignableFrom(clazz) || Advisor.class.isAssignableFrom(clazz);
     }
 
     @Override
@@ -28,8 +78,5 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         return bean;
     }
 
-    @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
-        return null;
-    }
+
 }

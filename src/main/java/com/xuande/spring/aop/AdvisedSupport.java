@@ -9,14 +9,24 @@ import org.aopalliance.intercept.MethodInterceptor;
  **/
 public class AdvisedSupport {
 
+    // 被代理目标对象
     private TargetSource targetSource;
-
+    // 代理拦截器
     private MethodInterceptor methodInterceptor;
-
+    // 方法匹配器（判断是否满足通知条件）
     private MethodMatcher methodMatcher;
 
+    private boolean isProxyTargetClass;
 
     public AdvisedSupport() {
+    }
+
+    public boolean isProxyTargetClass() {
+        return isProxyTargetClass;
+    }
+
+    public void setProxyTargetClass(boolean proxyTargetClass) {
+        isProxyTargetClass = proxyTargetClass;
     }
 
     public AdvisedSupport(TargetSource targetSource, MethodInterceptor methodInterceptor, MethodMatcher methodMatcher) {

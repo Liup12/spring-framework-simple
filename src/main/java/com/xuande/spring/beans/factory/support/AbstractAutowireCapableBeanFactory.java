@@ -7,10 +7,8 @@ import com.xuande.spring.beans.BeansException;
 import com.xuande.spring.beans.PropertyValue;
 import com.xuande.spring.beans.PropertyValues;
 import com.xuande.spring.beans.factory.*;
-import com.xuande.spring.beans.factory.config.AutowireCapableBeanFactory;
-import com.xuande.spring.beans.factory.config.BeanDefinition;
-import com.xuande.spring.beans.factory.config.BeanPostProcessor;
-import com.xuande.spring.beans.factory.config.BeanReference;
+import com.xuande.spring.beans.factory.config.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -28,6 +26,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         Object bean = null;
         try {
+            bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (bean != null){
+                return bean;
+            }
             // 实例化bean
             bean = createBeanInstance(beanDefinition, beanName, args);
             // 给 Bean 填充属性
@@ -49,6 +51,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
+
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition){
+        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (bean != null){
+            bean = applyBeanPostprocessorAfterInitialization(bean, beanName);
+        }
+        return bean;
+
+    }
+
+    protected Object applyBeanPostProcessorBeforeInstantiation(Class<?> clazz, String beanName){
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessorList()) {
+
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+                Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(clazz, beanName);
+                if (bean != null){
+                    return bean;
+                }
+            }
+        }
+        return null;
+    }
     /**
      * 注册需要回调销毁方法的bean
      * @param beanName
