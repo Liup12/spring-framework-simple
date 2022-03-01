@@ -1,6 +1,7 @@
 package com.xuande.spring.beans.factory.config;
 
 import com.xuande.spring.beans.factory.HierarchicalBeanFactory;
+import com.xuande.spring.util.StringValueResolver;
 
 /**
  * @author : xuande
@@ -16,4 +17,15 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 
 
     void destroySingletons();
+
+
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    /**
+     * Resolve the given embedded value, e.g. an annotation attribute.
+     * @param value the value to resolve
+     * @return the resolved value (may be the original value as-is)
+     * @since 3.0
+     */
+    String resolveEmbeddedValue(String value);
 }
