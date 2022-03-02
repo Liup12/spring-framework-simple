@@ -8,7 +8,7 @@ package com.xuande.spring.beans.factory.config;
 public interface BeanPostProcessor {
 
     /**
-     * bean实例化前置处理
+     * bean初始化前置处理
      * @param bean
      * @param beanName
      * @return
@@ -17,7 +17,7 @@ public interface BeanPostProcessor {
 
 
     /**
-     * bean实例化后置处理
+     * bean初始化后置处理
      * @param bean
      * @param beanName
      * @return
