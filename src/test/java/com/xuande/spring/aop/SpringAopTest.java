@@ -1,14 +1,24 @@
 package com.xuande.spring.aop;
 
 import com.xuande.spring.ShopServiceInterceptor;
+import com.xuande.spring.UserService;
 import com.xuande.spring.aop.aspectj.AspectJExpressionPointCut;
 import com.xuande.spring.aop.framework.ProxyFactory;
 import com.xuande.spring.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import com.xuande.spring.beans.factory.config.BeanDefinition;
+import com.xuande.spring.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import com.xuande.spring.context.support.ClasspathXmlApplicationContext;
 import com.xuande.spring.service.IShopService;
+import com.xuande.spring.service.ITradeService;
 import com.xuande.spring.service.impl.ShopService;
+import com.xuande.spring.service.impl.TradeService;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * @author : xuande
@@ -20,7 +30,11 @@ public class SpringAopTest {
 
     @Before
     public void init(){
-        IShopService shopService = new ShopService();
+        CglibSubclassingInstantiationStrategy subclassingInstantiationStrategy = new CglibSubclassingInstantiationStrategy();
+        BeanDefinition beanDefinition = new BeanDefinition(ShopService.class);
+
+        IShopService shopService = (ShopService) subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", null, null);
+
         advisedSupport = new AdvisedSupport();
         advisedSupport.setMethodInterceptor(new ShopServiceInterceptor());
         advisedSupport.setTargetSource(new TargetSource(shopService));
@@ -56,5 +70,32 @@ public class SpringAopTest {
         IShopService shopService = applicationContext.getBean("shopService", IShopService.class);
 
         System.out.println(shopService.queryShopInfo());
+    }
+
+    @Test
+    public void test() throws NoSuchMethodException {
+        CglibSubclassingInstantiationStrategy subclassingInstantiationStrategy = new CglibSubclassingInstantiationStrategy();
+        BeanDefinition beanDefinition = new BeanDefinition(ShopService.class);
+
+        Constructor<?>[] declaredConstructors = beanDefinition.getBeanClass().getDeclaredConstructors();
+        Constructor constructorToUse = null;
+        for (Constructor ctor : declaredConstructors) {
+            if (ctor.getParameterTypes().length == 0) {
+                constructorToUse = ctor;
+                break;
+            }
+        }
+        Object shopService = subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", constructorToUse, new Object[]{});
+
+        IShopService o = (IShopService) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), beanDefinition.getBeanClass().getInterfaces(), new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+                System.out.println("你被代理了");
+                return method.invoke(shopService, args);
+            }
+        });
+
+        System.out.println(o.queryShopInfo());
     }
 }

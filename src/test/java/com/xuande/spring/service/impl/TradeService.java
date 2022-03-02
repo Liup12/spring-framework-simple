@@ -21,7 +21,8 @@ public class TradeService implements ITradeService {
 
     @Override
     public String selectByTradeId(String tradeId) {
-        return tradeDao.selectById(tradeId);
+        //return tradeDao.selectById(tradeId);
+        return "店鋪 123123221321";
     }
 
     @Override
