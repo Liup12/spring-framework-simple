@@ -33,7 +33,7 @@ public class SpringAopTest {
         CglibSubclassingInstantiationStrategy subclassingInstantiationStrategy = new CglibSubclassingInstantiationStrategy();
         BeanDefinition beanDefinition = new BeanDefinition(ShopService.class);
 
-        IShopService shopService = (ShopService) subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", null, null);
+        ShopService shopService = (ShopService) subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", null, null);
 
         advisedSupport = new AdvisedSupport();
         advisedSupport.setMethodInterceptor(new ShopServiceInterceptor());
@@ -76,18 +76,9 @@ public class SpringAopTest {
     public void test() throws NoSuchMethodException {
         CglibSubclassingInstantiationStrategy subclassingInstantiationStrategy = new CglibSubclassingInstantiationStrategy();
         BeanDefinition beanDefinition = new BeanDefinition(ShopService.class);
+        Object shopService = subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", null, null);
 
-        Constructor<?>[] declaredConstructors = beanDefinition.getBeanClass().getDeclaredConstructors();
-        Constructor constructorToUse = null;
-        for (Constructor ctor : declaredConstructors) {
-            if (ctor.getParameterTypes().length == 0) {
-                constructorToUse = ctor;
-                break;
-            }
-        }
-        Object shopService = subclassingInstantiationStrategy.instantiate(beanDefinition, "shopService", constructorToUse, new Object[]{});
-
-        IShopService o = (IShopService) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), beanDefinition.getBeanClass().getInterfaces(), new InvocationHandler() {
+        IShopService o = (IShopService) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), shopService.getClass().getSuperclass().getInterfaces(), new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
