@@ -9,7 +9,7 @@ import com.xuande.spring.stereotype.Component;
  * @author xuande (xuande@dajiaok.com)
  * @date 2022/3/8  09:37:23
  */
-
+@Component
 public class FatherService implements IFatherService {
 
     @Autowired

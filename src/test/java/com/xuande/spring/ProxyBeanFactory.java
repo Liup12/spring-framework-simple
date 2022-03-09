@@ -13,7 +13,6 @@ import java.util.Map;
  * @author : xuande
  * @date : 2022-02-21 20:21
  **/
-@Component
 public class ProxyBeanFactory implements FactoryBean<IProductDao> {
 
 

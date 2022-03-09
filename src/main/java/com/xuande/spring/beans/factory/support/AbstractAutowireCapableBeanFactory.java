@@ -23,15 +23,29 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     public Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null){
+            return bean;
+        }
+        return doCreateBean(beanName, beanDefinition, args);
 
+    }
+
+    /**
+     * 创建bean
+     */
+    protected Object doCreateBean(String beanName, BeanDefinition beanDefinition, Object[] args){
         Object bean = null;
         try {
-            bean = resolveBeforeInstantiation(beanName, beanDefinition);
-            if (bean != null){
-                return bean;
-            }
             // 实例化bean
             bean = createBeanInstance(beanDefinition, beanName, args);
+
+            //提前暴露缓存，解决循环依赖
+
+            if (beanDefinition.isSingleton()){
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
+            }
 
             // 实例化后判断是否需要属性填充
             boolean continueWithPropertyPopulation = applyBeanPostProcessorAfterInstantiation(beanName, bean);
@@ -53,11 +67,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         //注册实现了DisposableBean接口的bean
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
+        Object exposedObject = bean;
         if (beanDefinition.isSingleton()){
-            registerSingletonBean(beanName, bean);
+            exposedObject = getSingletonBean(beanName);
+            registerSingletonBean(beanName, exposedObject);
         }
 
-        return bean;
+        return exposedObject;
+
+    }
+
+
+    protected Object getEarlyBeanReference(String beanName, BeanDefinition beanDefinition, Object bean){
+        Object exposedObject = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessorList()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+                exposedObject = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(bean, beanName);
+                if (exposedObject == null){
+                    return exposedObject;
+                }
+            }
+        }
+        return exposedObject;
     }
 
     /**

@@ -10,7 +10,6 @@ import com.xuande.spring.stereotype.Component;
  * @author xuande (xuande@dajiaok.com)
  * @date 2022/3/1  10:58:02
  */
-@Component("tradeService")
 public class TradeService implements ITradeService {
 
     @Value("${token}")

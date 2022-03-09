@@ -17,6 +17,9 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author xuande (xuande@dajiaok.com)
@@ -26,6 +29,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     private DefaultListableBeanFactory beanFactory;
 
+    private final Set<Object> earlyProxyReference = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
@@ -63,8 +67,15 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) {
+        if (!earlyProxyReference.contains(beanName)){
+            return wrapIfNecessary(bean, beanName);
+        }
+        return bean;
+    }
+
+    protected Object wrapIfNecessary(Object bean, String beanName){
         if (isInfrastructureClass(bean.getClass())){
-            return null;
+            return bean;
         }
         Collection<AspectJExpressionPointCutAdvisor> pointCutAdvisors = beanFactory.getBeansOfType(AspectJExpressionPointCutAdvisor.class).values();
         for (AspectJExpressionPointCutAdvisor pointCutAdvisor : pointCutAdvisors) {
@@ -86,5 +97,9 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         return bean;
     }
 
-
+    @Override
+    public Object getEarlyBeanReference(Object bean, String beanName) {
+        earlyProxyReference.add(beanName);
+        return wrapIfNecessary(bean, beanName);
+    }
 }

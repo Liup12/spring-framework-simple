@@ -9,6 +9,7 @@ import com.xuande.spring.stereotype.Component;
  * @author xuande (xuande@dajiaok.com)
  * @date 2022/3/8  09:35:30
  */
+@Component
 public class SonService implements ISonService {
 
     @Autowired

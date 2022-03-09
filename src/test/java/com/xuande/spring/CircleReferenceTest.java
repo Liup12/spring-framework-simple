@@ -22,4 +22,13 @@ public class CircleReferenceTest {
         System.out.println(sonService.getSonName());
     }
 
+
+    @Test
+    public void testCircleAop(){
+        ClasspathXmlApplicationContext applicationContext = new ClasspathXmlApplicationContext(new String[]{"classpath:spring-scan.xml","classpath:spring-circle.xml"});
+        IFatherService fatherService = applicationContext.getBean(IFatherService.class);
+        ISonService sonService = applicationContext.getBean(ISonService.class);
+        System.out.println(fatherService.getFatherName());
+        System.out.println(sonService.getSonName());
+    }
 }
