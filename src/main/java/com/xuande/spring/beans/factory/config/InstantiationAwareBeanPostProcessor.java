@@ -18,6 +18,14 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
     Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName);
 
     /**
+     * 初始化方法执行之后，执行此方法
+     * @param bean
+     * @param beanName
+     * @return
+     */
+    boolean postProcessAfterInstantiation(Object bean, String beanName);
+
+    /**
      * 在 Bean 对象实例化完成后，设置属性操作之前执行此方法
      * @param pvs
      * @param bean

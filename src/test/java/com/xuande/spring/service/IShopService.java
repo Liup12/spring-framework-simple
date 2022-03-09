@@ -7,4 +7,7 @@ package com.xuande.spring.service;
 public interface IShopService {
 
     public String queryShopInfo();
+
+
+    public String queryShopToken();
 }

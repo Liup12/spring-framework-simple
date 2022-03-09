@@ -2,6 +2,7 @@ package com.xuande.spring;
 
 import com.xuande.spring.beans.factory.FactoryBean;
 import com.xuande.spring.dao.IProductDao;
+import com.xuande.spring.stereotype.Component;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author : xuande
  * @date : 2022-02-21 20:21
  **/
+@Component
 public class ProxyBeanFactory implements FactoryBean<IProductDao> {
 
 
