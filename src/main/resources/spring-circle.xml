@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
 
+    <bean id="fatherService" class="com.xuande.spring.service.impl.FatherService"></bean>
+    <bean id="sonService" class="com.xuande.spring.service.impl.SonService"></bean>
 
+    <bean id="fatherServiceBeforeAdvice" class="com.xuande.spring.aop.FatherServiceBeforeAdvice"></bean>
     <bean class="com.xuande.spring.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>
 
     <bean id="methodBeforeAdviceInterceptor" class="com.xuande.spring.aop.framework.adapter.MethodBeforeAdviceInterceptor">

@@ -1,5 +1,6 @@
 package com.xuande.spring;
 
+import com.xuande.spring.aop.FatherServiceBeforeAdvice;
 import com.xuande.spring.context.support.ClasspathXmlApplicationContext;
 import com.xuande.spring.service.IFatherService;
 import com.xuande.spring.service.ISonService;
@@ -25,7 +26,7 @@ public class CircleReferenceTest {
 
     @Test
     public void testCircleAop(){
-        ClasspathXmlApplicationContext applicationContext = new ClasspathXmlApplicationContext(new String[]{"classpath:spring-scan.xml","classpath:spring-circle.xml"});
+        ClasspathXmlApplicationContext applicationContext = new ClasspathXmlApplicationContext(new String[]{"classpath:spring-circle.xml"});
         IFatherService fatherService = applicationContext.getBean(IFatherService.class);
         ISonService sonService = applicationContext.getBean(ISonService.class);
         System.out.println(fatherService.getFatherName());

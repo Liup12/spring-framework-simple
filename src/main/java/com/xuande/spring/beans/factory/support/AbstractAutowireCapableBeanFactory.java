@@ -57,7 +57,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             // 给 Bean 填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
-            // 初始化bean
+            // 初始化bean （普通bean\代理Bean）
             bean = initializeBean(beanName, bean, beanDefinition);
         }catch (Exception e){
             throw new BeansException("Instantiation of bean failed", e);
@@ -253,7 +253,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Invocation of init method of bean [" + beanName + "] failed", e);
         }
 
-        // 执行bean初始化方法后回调
+        // 执行bean初始化方法后回调(若被切面切中，则返回aop代理对象)
         wrappedBean = applyBeanPostprocessorAfterInitialization(wrappedBean, beanName);
 
         return wrappedBean;
