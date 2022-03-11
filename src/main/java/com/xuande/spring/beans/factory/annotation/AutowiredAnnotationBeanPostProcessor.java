@@ -1,12 +1,14 @@
 package com.xuande.spring.beans.factory.annotation;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.xuande.spring.beans.BeansException;
 import com.xuande.spring.beans.PropertyValues;
 import com.xuande.spring.beans.factory.BeanFactory;
 import com.xuande.spring.beans.factory.BeanFactoryAware;
 import com.xuande.spring.beans.factory.ConfigurableListableBeanFactory;
 import com.xuande.spring.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import com.xuande.spring.core.convert.ConversionService;
 import com.xuande.spring.util.ClassUtils;
 
 import java.lang.reflect.Field;
@@ -33,6 +35,15 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
             if (null != valueAnnotation){
                 String value = valueAnnotation.value();
                 value = beanFactory.resolveEmbeddedValue(value);
+
+                //类型转换
+                Class<?> sourceType = value.getClass();
+                Class<?> targetType = TypeUtil.getClass(field.getType());
+                ConversionService conversionService = beanFactory.getConversionService();
+                if (conversionService.canConvert(sourceType, targetType)) {
+                    value = conversionService.convert(value, targetType);
+                }
+
                 BeanUtil.setProperty(bean, field.getName(), value);
             }
         }

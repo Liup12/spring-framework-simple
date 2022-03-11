@@ -11,6 +11,7 @@ import com.xuande.spring.context.event.ApplicationEventMulticaster;
 import com.xuande.spring.context.event.ContextClosedEvent;
 import com.xuande.spring.context.event.ContextRefreshedEvent;
 import com.xuande.spring.context.event.SimpleApplicationEventMulticaster;
+import com.xuande.spring.core.convert.ConversionService;
 import com.xuande.spring.core.io.DefaultResourceLoader;
 import com.xuande.spring.core.io.Resource;
 
@@ -51,8 +52,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         // 7、注册事件监听器
         registerListener();
 
-        // 8、提前实例化单例Bean对象
-        beanFactory.preInstantiateSingletons();
+        // 8、设置类型转换器，提前实例化bean对象
+        finishBeanFactoryInitialization(beanFactory);
 
         // 9、发布容器刷新完成事件
         finishRefresh();
@@ -62,6 +63,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     protected abstract ConfigurableListableBeanFactory getBeanFactory();
 
+    public void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory){
+        if (beanFactory.containsBean("conversionService")) {
+            Object conversionService = beanFactory.getBean("conversionService");
+            if (conversionService instanceof ConversionService) {
+                beanFactory.setConversionService((ConversionService) conversionService);
+            }
+        }
+
+        // 8、提前实例化单例Bean对象
+        beanFactory.preInstantiateSingletons();
+    }
 
     public void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory){
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class);
@@ -119,6 +131,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     @Override
     public <T> T getBean(Class<T> requiredType) throws BeansException {
         return getBeanFactory().getBean(requiredType);
+    }
+
+    @Override
+    public boolean containsBean(String beanName) {
+        return getBeanFactory().containsBean(beanName);
     }
 
     @Override

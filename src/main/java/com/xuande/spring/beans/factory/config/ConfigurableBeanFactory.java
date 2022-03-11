@@ -1,6 +1,7 @@
 package com.xuande.spring.beans.factory.config;
 
 import com.xuande.spring.beans.factory.HierarchicalBeanFactory;
+import com.xuande.spring.core.convert.ConversionService;
 import com.xuande.spring.util.StringValueResolver;
 
 /**
@@ -28,4 +29,10 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * @since 3.0
      */
     String resolveEmbeddedValue(String value);
+
+
+    void setConversionService(ConversionService service);
+
+
+    ConversionService getConversionService();
 }

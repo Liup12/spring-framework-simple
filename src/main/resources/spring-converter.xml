@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="conversionService" class="com.xuande.spring.context.support.ConversionServiceFactoryBean">
+        <property name="converters" ref="converters"></property>
+    </bean>
+
+
+    <bean id="converters" class="com.xuande.spring.converter.ConverterFactoryBean"></bean>
+
+    <bean id="tradeBean" class="com.xuande.spring.converter.TradeBean">
+        <property name="itemCode" value="TEST001"></property>
+        <property name="weight" value="100"></property>
+        <property name="buyDay" value="2021-11-01"></property>
+    </bean>
+</beans>

@@ -5,6 +5,7 @@ import com.xuande.spring.beans.factory.FactoryBean;
 import com.xuande.spring.beans.factory.config.BeanDefinition;
 import com.xuande.spring.beans.factory.config.BeanPostProcessor;
 import com.xuande.spring.beans.factory.config.ConfigurableBeanFactory;
+import com.xuande.spring.core.convert.ConversionService;
 import com.xuande.spring.util.ClassUtils;
 import com.xuande.spring.util.StringValueResolver;
 
@@ -23,6 +24,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
     private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
 
+    private ConversionService conversionService;
+
     @Override
     public Object genBean(String beanName) throws BeansException {
         return doGetBean(beanName,  null);
@@ -36,6 +39,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     @Override
     public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
         return (T) getBean(name);
+    }
+
+    @Override
+    public boolean containsBean(String beanName) {
+        return containsBeanDefinition(beanName);
     }
 
     /**
@@ -78,6 +86,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
     protected abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object [] args) throws BeansException;
 
+    protected abstract boolean containsBeanDefinition(String beanName);
 
     @Override
     public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
@@ -106,5 +115,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
             result = resolver.resolverStringValue(result);
         }
         return result;
+    }
+
+    @Override
+    public void setConversionService(ConversionService service) {
+        this.conversionService = service;
+    }
+
+    @Override
+    public ConversionService getConversionService() {
+        return this.conversionService;
     }
 }
